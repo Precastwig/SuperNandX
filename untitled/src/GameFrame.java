@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.Ellipse2D;
 
 /**
  * Created by Precastwig on 02/09/2017.
@@ -22,6 +23,9 @@ public class GameFrame extends JPanel {
     private Color highlightOccupiedCellColor;
     private Color highlightFreeBorderColor;
     private Color highlightFreeCellColor;
+    private Color playerOneColor;
+    private Color playerTwoColor;
+    private Color outOfPlayColor;
 
     private int highlightCellX;
     private int highlightCellY;
@@ -34,6 +38,8 @@ public class GameFrame extends JPanel {
 
     private GameGrid currentGrid;
     private int currentplayer = 1;
+    private static int OPACITY = 100;
+    private static int HIGHLIGHTOPACITY = 170;
 
     public GameFrame() {
         this.padding = DEFAULT_PADDING;
@@ -42,10 +48,13 @@ public class GameFrame extends JPanel {
         this.borderColor = Color.lightGray;
         this.majorborderColor = Color.BLACK;
         this.foregroundColor = Color.BLACK;
-        this.highlightFreeBorderColor = new Color(100,200,100);
-        this.highlightFreeCellColor = Color.GREEN;
-        this.highlightOccupiedBorderColor = Color.PINK;
-        this.highlightOccupiedCellColor = Color.RED;
+        this.highlightFreeBorderColor = new Color(100,200,100,HIGHLIGHTOPACITY);
+        this.highlightFreeCellColor = new Color(9,181,31,HIGHLIGHTOPACITY);
+        this.highlightOccupiedBorderColor = new Color(244,66,182,HIGHLIGHTOPACITY);
+        this.highlightOccupiedCellColor = new Color(232,39,39,HIGHLIGHTOPACITY);
+        this.playerOneColor = new Color(66,134,244,OPACITY);
+        this.playerTwoColor = new Color(244,155,66,OPACITY);
+        this.outOfPlayColor = new Color(181,172,164,75);
         setFont(DEFAULT_FONT);
 
         currentGrid = new GameGrid();
@@ -123,10 +132,17 @@ public class GameFrame extends JPanel {
                 && highlightCellY < verticalCells) {
             boolean cellOccupied = currentGrid.getCell(highlightCellX,
                     highlightCellY) != 0;
+            Point p = currentGrid.getLastplayed();
             if (cellOccupied) {
                 g.setColor(this.highlightOccupiedBorderColor);
             } else {
-                g.setColor(this.highlightFreeBorderColor);
+                if ((p.x == Math.floor((double) highlightCellX / 3.0) &&
+                        p.y == Math.floor((double) highlightCellY / 3.0)) ||
+                        (p.x == -1 && p.y == -1) ){
+                    g.setColor(this.highlightFreeBorderColor);
+                } else {
+                    g.setColor(this.highlightOccupiedBorderColor);
+                }
             }
 
             // Draw the border.
@@ -137,7 +153,13 @@ public class GameFrame extends JPanel {
             if (cellOccupied) {
                 g.setColor(this.highlightOccupiedCellColor);
             } else {
-                g.setColor(this.highlightFreeCellColor);
+                if ((p.x == Math.floor((double) highlightCellX / 3.0) &&
+                        p.y == Math.floor((double) highlightCellY / 3.0)) ||
+                (p.x == -1 && p.y == -1) ) {
+                    g.setColor(this.highlightFreeCellColor);
+                } else {
+                    g.setColor(this.highlightOccupiedCellColor);
+                }
             }
 
             //Draw the cell
@@ -156,16 +178,16 @@ public class GameFrame extends JPanel {
 
         int verticalSkip = 16;
 
-        //Font font = prepareFont(cellLength, verticalSkip, g);
+        Font font = prepareFont(cellLength, verticalSkip, g);
 
-        g.setFont(getFont());
+        g.setFont(font);
 
         Graphics2D g2 = (Graphics2D) g;
 
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
                 RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-        FontMetrics fm = g.getFontMetrics(getFont());
+        FontMetrics fm = g.getFontMetrics(font);
 
         int textHeight = fm.getAscent();
         int textWidth = fm.stringWidth("X");
@@ -189,18 +211,64 @@ public class GameFrame extends JPanel {
             }
         }
 
+        int widthofsubgame = (borderWidth * 3) + (cellLength * 3);
+        g2.setStroke(new BasicStroke(borderWidth * 3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL));
         //Draw winner x's
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
-                String mark;
-                if(currentGrid.checkWinners(x,y) == 1) {mark = "X";} else
-                if(currentGrid.checkWinners(x,y) == 2) {mark = "O";}
-                else {
-                    continue;
+                if (currentGrid.checkWinners(x,y) != 0) {
+                    int tlx = skipX + ( widthofsubgame * x );
+                    int tly = skipY + ( widthofsubgame * y );
+                    //System.out.println("Putting square at " + tlx + "," + tly + "," + widthofsubgame + "px");
+                    if (currentGrid.checkWinners(x, y) == 1) {
+                        //Drawing an X
+                        g2.setColor(playerOneColor);
+                        g2.drawLine(tlx + borderWidth,tly + borderWidth,tlx+widthofsubgame - borderWidth,tly+widthofsubgame - borderWidth);
+                        g2.drawLine(tlx+widthofsubgame - borderWidth,tly + borderWidth,tlx + borderWidth,tly+widthofsubgame - borderWidth);
+                    } else if (currentGrid.checkWinners(x, y) == 2) {
+                        g2.setColor(playerTwoColor);
+                        Shape circle = new Ellipse2D.Float(tlx + borderWidth,tly + borderWidth,widthofsubgame - borderWidth,widthofsubgame - borderWidth);
+                        g2.draw(circle);
+                    }
+
+                    g2.fillRect(tlx,tly, widthofsubgame + borderWidth, widthofsubgame + borderWidth);
                 }
-                g.drawString(mark,
-                        skipX + dx + borderWidth * (1 + (x * 3)) + x * cellLength,
-                        skipY - dy - 8 + borderWidth * (1 + (y * 3) + (1 + y * 3) * cellLength));
+            }
+        }
+
+        //Draw out of play squares
+        g2.setColor(outOfPlayColor);
+        Point p = currentGrid.getLastplayed();
+        if (p.x == -1 && p.y == -1) {
+            //Then we have no out of play squares
+        } else {
+            for (int y = 0; y < 3; y++) {
+                for (int x = 0; x < 3; x++) {
+                    if (p.x == x && p.y == y) {
+
+                    } else {
+                        int tlx = skipX + (widthofsubgame * x);
+                        int tly = skipY + (widthofsubgame * y);
+                        g2.fillRect(tlx, tly, widthofsubgame + borderWidth, widthofsubgame + borderWidth);
+                    }
+                }
+            }
+        }
+    }
+
+    private Font prepareFont(int cellLength, int verticalSkip, Graphics g) {
+        Font currentFont = getFont();
+
+        for (int fontSize = 1; ; ++fontSize) {
+            Font f = new Font(currentFont.getFontName(), Font.BOLD, fontSize);
+            FontMetrics fm = g.getFontMetrics(f);
+
+            int height = fm.getAscent();
+
+            if (height >= cellLength - verticalSkip) {
+                return new Font(currentFont.getFontName(),
+                        Font.BOLD,
+                        fontSize - 1);
             }
         }
     }
@@ -247,15 +315,19 @@ public class GameFrame extends JPanel {
         }
         //System.out.println("point: " + p.x + "," + p.y);
         if (p.x >= 0 && p.x < currentGrid.getWidth()) {
-            if (currentGrid.setCell(p.x,p.y,currentplayer) == false) {
-                //Put stuff here?
+            Point prev = currentGrid.getLastplayed();
+            if ((prev.x == Math.floor((double)p.x / 3.0) &&
+                    prev.y == Math.floor((double)p.y / 3.0)) ||
+                    (prev.x == -1 && prev.y == -1) ) {
+                if (currentGrid.setCell(p.x, p.y, currentplayer) == true) {
+                    if (currentplayer == 1) {
+                        currentplayer = 2;
+                    } else {
+                        currentplayer = 1;
+                    }
+                }
             }
             //System.out.println(currentGrid.getCell(p.x,p.y));
-            if (currentplayer == 1) {
-                currentplayer = 2;
-            } else {
-                currentplayer = 1;
-            }
             repaint();
         }
     }

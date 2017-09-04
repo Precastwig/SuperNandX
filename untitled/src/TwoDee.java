@@ -5,6 +5,7 @@ public class TwoDee {
     private int[][] array;
     private int width;
     private int height;
+    private int winner = 0;
 
     public TwoDee(int width, int height) {
         array = new int[width][height];
@@ -21,6 +22,7 @@ public class TwoDee {
         } else {
             if (array[x][y] == 0) {
                 array[x][y] = player;
+                checkwin();
                 return true;
                 //success
             } else {
@@ -46,21 +48,40 @@ public class TwoDee {
         }
     }
 
+    public void printGame() {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                System.out.print(" " + array[x][y] + " ");
+                if (x == height -1) {
+                    System.out.println();
+                }
+            }
+        }
+    }
+
     public int checkwin() {
-        int winner = 0;
-        for (int i = 0; i < width; i++) {
-            if (array[i][0] == array[i][1] && array[i][1] == array[i][2]) {
-                winner = array[i][0];
+        if (winner == 0) {
+            for (int i = 0; i < width; i++) {
+                if (array[i][0] == array[i][1] && array[i][1] == array[i][2] && array[i][0] != 0) {
+                    winner = array[i][0];
+                    return winner;
+                }
+                if (array[0][i] == array[1][i] && array[1][i] == array[2][i] && array[0][i] != 0) {
+                    winner = array[0][i];
+                    return winner;
+                }
             }
-            if (array[0][i] == array[1][i] && array[1][i] == array[2][i]) {
-                winner = array[0][i];
+            if (array[0][0] == array[1][1] && array[1][1] == array[2][2] && array[0][0] != 0) {
+                winner = array[0][0];
+                return winner;
             }
+            if (array[2][0] == array[1][1] && array[1][1] == array[0][2] && array[2][0] != 0) {
+                winner = array[2][0];
+                return winner;
+            }
+            return winner;
+        } else {
+            return winner;
         }
-        if (array[0][0] == array[1][1] && array[1][1] == array[2][2]) {
-            winner = array[0][0];
-        } else if (array[2][0] == array[1][1] && array[1][1] == array[0][2]) {
-            winner = array[2][0];
-        }
-        return winner;
     }
 }

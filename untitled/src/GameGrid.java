@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.jar.Pack200;
 
@@ -11,6 +12,7 @@ public class GameGrid {
     private int height = DEFAULT_SIZE;
     private TwoDee[][] grid = new TwoDee[width][height];
     private int[][] winners = new int[width][height];
+    private Point lastplayed = new Point(-1,-1);
 
     public GameGrid() {
         for(int i = 0; i < width; i++) {
@@ -29,11 +31,14 @@ public class GameGrid {
     }
 
     private void updateWinners() {
-        System.out.println("Updating winners");
+        //System.out.println("Updating winners");
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 if (winners[i][j] == 0) { //Makes sure the first winner of a square is the winner
+                    //System.out.println("Checking subgame " + i + "," + j);
+                    //grid[i][j].printGame();
                     winners[i][j] = grid[i][j].checkwin();
+                    //System.out.println(winners[i][j]);
                 }
             }
         }
@@ -84,12 +89,16 @@ public class GameGrid {
     private void printwinners() {
         for(int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-                System.out.print(" " + winners[i][j] + " ");
+                System.out.print(" " + winners[j][i] + " ");
                 if (j == height - 1) {
                     System.out.println();
                 }
             }
         }
+    }
+
+    public Point getLastplayed(){
+        return lastplayed;
     }
 
     public boolean setCell(int x, int y, int player) {
@@ -99,7 +108,14 @@ public class GameGrid {
 
     public boolean setCell(int gx, int gy, int x, int y, int player) {
         if (grid[gx][gy].getCell(x,y) == 0) {
-            grid[gx][gy].setCell(x,y,player);
+            if (grid[gx][gy].checkwin() == 0) {
+                lastplayed.x = x;
+                lastplayed.y = y;
+            } else {
+                lastplayed.x = -1;
+                lastplayed.y = -1;
+            }
+            grid[gx][gy].setCell(x, y, player);
             updateWinners();
             //printwinners();
             return true;
