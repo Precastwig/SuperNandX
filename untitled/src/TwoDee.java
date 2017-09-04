@@ -1,0 +1,66 @@
+/**
+ * Created by Precastwig on 02/09/2017.
+ */
+public class TwoDee {
+    private int[][] array;
+    private int width;
+    private int height;
+
+    public TwoDee(int width, int height) {
+        array = new int[width][height];
+        this.width = width;
+        this.height = height;
+    }
+
+    public boolean setCell(int x, int y, int player) {
+        //System.out.println("Setting " + x + "," + y + " to " + player);
+        if (x < 0 || x >= width || y < 0 || y >= height) {
+            System.out.println("Out of bounds error");
+            return false;
+            // Out of bounds error
+        } else {
+            if (array[x][y] == 0) {
+                array[x][y] = player;
+                return true;
+                //success
+            } else {
+                System.out.println("Cell already set error");
+                return false;
+                // Already set cell
+            }
+        }
+    }
+
+    public int getCell(int x, int y) {
+        if (x > width || x < 0 || y > height || y < 0) {
+            throw new RuntimeException();
+        }
+        return array[x][y];
+    }
+
+    public void reset() {
+        for(int i = 0; i < width; i++) {
+            for(int j = 0; j < height; j++) {
+                array[i][j] = 0;
+            }
+        }
+    }
+
+    public int checkwin() {
+        int winner = 0;
+        for (int i = 0; i < width; i++) {
+            if (array[i][0] == array[i][1] && array[i][1] == array[i][2]) {
+                winner = array[i][0];
+            }
+            if (array[0][i] == array[1][i] && array[1][i] == array[2][i]) {
+                winner = array[0][i];
+            }
+        }
+        if (array[0][0] == array[1][1] && array[1][1] == array[2][2]) {
+            winner = array[0][0];
+        } else if (array[2][0] == array[1][1] && array[1][1] == array[0][2]) {
+            winner = array[2][0];
+        }
+        return winner;
+    }
+}
