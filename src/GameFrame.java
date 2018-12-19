@@ -37,12 +37,13 @@ public class GameFrame extends JPanel {
     private int lastValidCellY = -1;
 
     private GameGrid currentGrid;
+    private labelListener listener;
     private int currentplayer = 1;
     private JLabel bottomlabel;
     private static int OPACITY = 100;
     private static int HIGHLIGHTOPACITY = 170;
 
-    public GameFrame() {
+    public GameFrame(labelListener label) {
         this.padding = DEFAULT_PADDING;
         this.borderWidth = DEFAULT_BORDER_WIDTH;
         this.backgroundColor = Color.WHITE;
@@ -60,6 +61,7 @@ public class GameFrame extends JPanel {
 
         bottomlabel = new JLabel("");
         currentGrid = new GameGrid();
+        listener = label;
         this.setMinimumSize(new Dimension(500,500));
         CanvasMouseListener mouselisten = new CanvasMouseListener();
         this.addMouseListener(mouselisten);
@@ -323,8 +325,10 @@ public class GameFrame extends JPanel {
                     (prev.x == -1 && prev.y == -1) ) {
                 if (currentGrid.setCell(p.x, p.y, currentplayer) == true) {
                     if (currentplayer == 1) {
+                        listener.changeturns(2);
                         currentplayer = 2;
                     } else {
+                        listener.changeturns(1);
                         currentplayer = 1;
                     }
                 }
