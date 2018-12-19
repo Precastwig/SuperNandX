@@ -14,7 +14,7 @@ public class main {
 
     public static void main(String[] args) {
         frame = new JFrame("Super Noughts and Crosses");
-        frame.setSize(600,600);
+        frame.setSize(600,700);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         GameFrame main = new GameFrame();
         frame.add(main);

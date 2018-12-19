@@ -38,6 +38,7 @@ public class GameFrame extends JPanel {
 
     private GameGrid currentGrid;
     private int currentplayer = 1;
+    private JLabel bottomlabel;
     private static int OPACITY = 100;
     private static int HIGHLIGHTOPACITY = 170;
 
@@ -57,6 +58,7 @@ public class GameFrame extends JPanel {
         this.outOfPlayColor = new Color(181,172,164,75);
         setFont(DEFAULT_FONT);
 
+        bottomlabel = new JLabel("");
         currentGrid = new GameGrid();
         this.setMinimumSize(new Dimension(500,500));
         CanvasMouseListener mouselisten = new CanvasMouseListener();

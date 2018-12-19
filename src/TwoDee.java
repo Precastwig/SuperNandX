@@ -12,6 +12,9 @@ public class TwoDee {
         this.width = width;
         this.height = height;
     }
+    // 0 is an unset cell
+    // 1 is X
+    // 2 is O
 
     public boolean setCell(int x, int y, int player) {
         //System.out.println("Setting " + x + "," + y + " to " + player);
@@ -34,6 +37,7 @@ public class TwoDee {
     }
 
     public int getCell(int x, int y) {
+        // Check if they're getting a nonexistent cell
         if (x > width || x < 0 || y > height || y < 0) {
             throw new RuntimeException();
         }
@@ -41,6 +45,7 @@ public class TwoDee {
     }
 
     public void reset() {
+        // Does what it says on the tin
         for(int i = 0; i < width; i++) {
             for(int j = 0; j < height; j++) {
                 array[i][j] = 0;
@@ -49,6 +54,7 @@ public class TwoDee {
     }
 
     public void printGame() {
+        //Prints it poorly for debugging
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 System.out.print(" " + array[x][y] + " ");
@@ -83,5 +89,16 @@ public class TwoDee {
         } else {
             return winner;
         }
+    }
+
+    public boolean isfull() {
+      for (int y = 0; y < height; y++) {
+          for (int x = 0; x < width; x++) {
+              if (array[x][y] == 0) {
+                  return false;
+              }
+          }
+      }
+      return true;
     }
 }

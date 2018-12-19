@@ -108,12 +108,12 @@ public class GameGrid {
 
     public boolean setCell(int gx, int gy, int x, int y, int player) {
         if (grid[gx][gy].getCell(x,y) == 0) {
-            if (grid[gx][gy].checkwin() == 0) {
-                lastplayed.x = x;
-                lastplayed.y = y;
+            if (grid[x][y].isfull()) {
+              lastplayed.x = -1;
+              lastplayed.y = -1;
             } else {
-                lastplayed.x = -1;
-                lastplayed.y = -1;
+              lastplayed.x = x;
+              lastplayed.y = y;
             }
             grid[gx][gy].setCell(x, y, player);
             updateWinners();
