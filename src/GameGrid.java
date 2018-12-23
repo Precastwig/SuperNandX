@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.jar.Pack200;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created by Precastwig on 02/09/2017.
@@ -52,7 +53,7 @@ public class GameGrid {
         return winners;
     }
 
-    public int checkWin() {
+    public int checkVictory() {
         int winner = 0;
         updateWinners();
         for (int i = 0; i < width; i++) {
@@ -71,6 +72,7 @@ public class GameGrid {
         return winner;
     }
 
+    //Translates from 0-8,0-8 to 0-2,0-2,0-2,0-2
     private int[] translateCoords(int x, int y) {
         int[] ret = new int[4];
         int gx = (int) Math.floor((double)x / (double)width);
@@ -86,6 +88,14 @@ public class GameGrid {
         return ret;
     }
 
+    //Translates from 0-2,0-2,0-2,0-2 to 0-8,0-8
+    private Point reverseTranslateCoords(int gx, int gy, int x, int y) {
+      Point ret = new Point(0,0);
+      ret.x = (gx * width) + x;
+      ret.y = (gy * height) + y;
+      return ret;
+    }
+
     private void printwinners() {
         for(int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
@@ -95,6 +105,40 @@ public class GameGrid {
                 }
             }
         }
+    }
+
+    // BEGIN FINDING BEST NEXT LOCATION
+    // NOT SURE HOW YET
+    // ability 0 = random
+    //         1 = basic tree search?
+    public Point findcompspot(int ability) {
+        int gx=0,gy=0,x=0,y=0;
+        switch (ability) {
+          case 0:
+            //Find empty totally random spot
+            //If we have all choice then pick a supersquare
+            if (lastplayed.x == -1 && lastplayed.y == -1) {
+              //Find empty game
+              do {
+                gx = ThreadLocalRandom.current().nextInt(0,width);
+                gy = ThreadLocalRandom.current().nextInt(0,height);
+              } while (grid[gx][gy].isfull());
+            } else {
+              gx = lastplayed.x;
+              gy = lastplayed.y;
+              System.out.println(gx + " " + gy);
+            }
+
+            do {
+              x = ThreadLocalRandom.current().nextInt(0,width);
+              y = ThreadLocalRandom.current().nextInt(0,height);
+              System.out.println("[" + x + " " + y + "]");
+            } while (grid[gx][gy].getCell(x,y) != 0);
+            break;
+          case 1:
+          break;
+        }
+        return reverseTranslateCoords(gx,gy,x,y);
     }
 
     public Point getLastplayed(){

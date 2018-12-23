@@ -23,6 +23,7 @@ public class main {
         menu.add(col);
         JMenuItem item = new JMenuItem("Connect");
         col.add(item);
+        // col.addOnClickListener()
 
         // Create the turn label and set it up
         ResponsiveLabel turnlabel = new ResponsiveLabel();

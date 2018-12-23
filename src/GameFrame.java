@@ -74,6 +74,7 @@ public class GameFrame extends JPanel {
 
     @Override
     public void update(Graphics g) {
+        //some starting maths
         int availableWidth  = getWidth() - 2 * padding;
         int availableHeight = getHeight() - 2 * padding;
 
@@ -415,10 +416,14 @@ public class GameFrame extends JPanel {
                     break;
                 case KeyEvent.VK_SPACE:
                     tryClick(highlightCellX,highlightCellY,false);
+                    break;
+                case KeyEvent.VK_C:
+                    Point p = currentGrid.findcompspot(0);
+                    tryClick(p.x,p.y,false);
+                    break;
             }
         }
     }
-
 
     private class CanvasMouseListener implements MouseListener, MouseMotionListener {
         @Override
