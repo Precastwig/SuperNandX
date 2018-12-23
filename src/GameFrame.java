@@ -38,6 +38,7 @@ public class GameFrame extends JPanel {
 
     private GameGrid currentGrid;
     private labelListener listener;
+    private boolean end = false;
     private int currentplayer = 1;
     private JLabel bottomlabel;
     private static int OPACITY = 100;
@@ -241,22 +242,34 @@ public class GameFrame extends JPanel {
             }
         }
 
-        //Draw out of play squares
+        //Draw out of play (grey) squares
         g2.setColor(outOfPlayColor);
         Point p = currentGrid.getLastplayed();
         if (p.x == -1 && p.y == -1) {
             //Then we have no out of play squares
         } else {
-            for (int y = 0; y < 3; y++) {
-                for (int x = 0; x < 3; x++) {
-                    if (p.x == x && p.y == y) {
+            if (end) {
+              //All squares are out of play if game has ended
+              for (int y = 0; y < 3; y++) {
+                  for (int x = 0; x < 3; x++) {
+                      int tlx = skipX + (widthofsubgame * x);
+                      int tly = skipY + (widthofsubgame * y);
+                      g2.fillRect(tlx, tly, widthofsubgame + borderWidth, widthofsubgame + borderWidth);
+                  }
+              }
+            } else {
+              //Otherwise just fill squares that are out of play
+              for (int y = 0; y < 3; y++) {
+                  for (int x = 0; x < 3; x++) {
+                      if (p.x == x && p.y == y) {
 
-                    } else {
-                        int tlx = skipX + (widthofsubgame * x);
-                        int tly = skipY + (widthofsubgame * y);
-                        g2.fillRect(tlx, tly, widthofsubgame + borderWidth, widthofsubgame + borderWidth);
-                    }
-                }
+                      } else {
+                          int tlx = skipX + (widthofsubgame * x);
+                          int tly = skipY + (widthofsubgame * y);
+                          g2.fillRect(tlx, tly, widthofsubgame + borderWidth, widthofsubgame + borderWidth);
+                      }
+                  }
+              }
             }
         }
     }
@@ -312,58 +325,71 @@ public class GameFrame extends JPanel {
     }
 
     private void tryClick(int x, int y, boolean translatecoords) {
-        Point p;
-        if (translatecoords == true) {
-            p = toCellCoordinates(x, y);
-        } else {
-            p = new Point(x,y);
-        }
-        //System.out.println("point: " + p.x + "," + p.y);
-        if (p.x >= 0 && p.x < currentGrid.getWidth()) {
-            Point prev = currentGrid.getLastplayed();
-            if ((prev.x == Math.floor((double)p.x / 3.0) &&
-                    prev.y == Math.floor((double)p.y / 3.0)) ||
-                    (prev.x == -1 && prev.y == -1) ) {
-                if (currentGrid.setCell(p.x, p.y, currentplayer) == true) {
-                    if (currentplayer == 1) {
-                        listener.changeturns(2);
-                        currentplayer = 2;
-                    } else {
-                        listener.changeturns(1);
-                        currentplayer = 1;
-                    }
-                }
+        if (!end) {
+          Point p;
+          if (translatecoords == true) {
+              p = toCellCoordinates(x, y);
+          } else {
+              p = new Point(x,y);
+          }
+          //System.out.println("point: " + p.x + "," + p.y);
+          if (p.x >= 0 && p.x < currentGrid.getWidth()) {
+              Point prev = currentGrid.getLastplayed();
+              if ((prev.x == Math.floor((double)p.x / 3.0) &&
+                      prev.y == Math.floor((double)p.y / 3.0)) ||
+                      (prev.x == -1 && prev.y == -1) ) {
+                  if (currentGrid.setCell(p.x, p.y, currentplayer) == true) {
+                      if (currentplayer == 1) {
+                          listener.changelabel("O to play");
+                          currentplayer = 2;
+                      } else {
+                          listener.changelabel("X to play");
+                          currentplayer = 1;
+                      }
+                  }
+              }
+              int winner = currentGrid.checkVictory();
+              if (winner == 1) {
+                end = true;
+                listener.changelabel("X Wins!");
+                // currentGrid.printwinners();
+            } else if (winner == 2) {
+                end = true;
+                listener.changelabel("O Wins!");
             }
-            //System.out.println(currentGrid.getCell(p.x,p.y));
-            repaint();
+              //System.out.println(currentGrid.getCell(p.x,p.y));
+              repaint();
+          }
         }
     }
 
     private void tryHighlight(int x, int y) {
-        Point p = toCellCoordinates(x,y);
-        if (p.x < 0) {
-            if (previousHighlightCellX != p.x) {
-                highlightCellX = p.x;
-                previousHighlightCellX = p.x;
-                repaint();
-            }
-            return;
-        }
+        if (!end) {
+          Point p = toCellCoordinates(x,y);
+          if (p.x < 0) {
+              if (previousHighlightCellX != p.x) {
+                  highlightCellX = p.x;
+                  previousHighlightCellX = p.x;
+                  repaint();
+              }
+              return;
+          }
 
-        if (p.x >= 0 && p.x < currentGrid.getWidth()) {
-            this.lastValidCellX = p.x;
-            this.lastValidCellY = p.y;
-        }
+          if (p.x >= 0 && p.x < currentGrid.getWidth()) {
+              this.lastValidCellX = p.x;
+              this.lastValidCellY = p.y;
+          }
 
-        this.highlightCellX = p.x;
-        this.highlightCellY = p.y;
+          this.highlightCellX = p.x;
+          this.highlightCellY = p.y;
 
-        if (highlightCellX != previousHighlightCellX
-                || highlightCellY != previousHighlightCellY) {
-            previousHighlightCellX = highlightCellX;
-            previousHighlightCellY = highlightCellY;
-            repaint();
+          if (highlightCellX != previousHighlightCellX
+                  || highlightCellY != previousHighlightCellY) {
+              previousHighlightCellX = highlightCellX;
+              previousHighlightCellY = highlightCellY;
+              repaint();
         }
+      }
     }
 
     private class CanvasKeyListener implements KeyListener {

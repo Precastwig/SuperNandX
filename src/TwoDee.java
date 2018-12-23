@@ -1,3 +1,4 @@
+import java.awt.*;
 /**
  * Created by Precastwig on 02/09/2017.
  */
@@ -89,6 +90,30 @@ public class TwoDee {
         } else {
             return winner;
         }
+    }
+
+    //Finds the winning path
+    //Returns a point where
+    //p.x = 1,2,3: the winning line is a column starting at 1,2,3
+    //p.y = 1,2,3: the winning line is a row starting at 1,2,3
+    //p.x = 1, p.y = 1: diagonal with positive gradient
+    //p.x = 1, p.y = -1: diagonal with negative gradient
+    public Point findwin() {
+        for (int i = 0; i < width; i++) {
+            if (array[i][0] == array[i][1] && array[i][1] == array[i][2] && array[i][0] != 0) {
+                return new Point(i+1,0);
+            }
+            if (array[0][i] == array[1][i] && array[1][i] == array[2][i] && array[0][i] != 0) {
+                return new Point(0,i+1);
+            }
+        }
+        if (array[0][0] == array[1][1] && array[1][1] == array[2][2] && array[0][0] != 0) {
+            return new Point(1,-1);
+        }
+        if (array[2][0] == array[1][1] && array[1][1] == array[0][2] && array[2][0] != 0) {
+            return new Point(1,1);
+        }
+        return new Point(0,0);
     }
 
     public boolean isfull() {

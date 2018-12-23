@@ -1,5 +1,5 @@
 import java.util.*;
 
 interface labelListener {
-		void changeturns(int turn);
+		void changelabel(String message);
 }
