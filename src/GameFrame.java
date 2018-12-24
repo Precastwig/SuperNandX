@@ -6,7 +6,7 @@ import java.awt.geom.Ellipse2D;
 /**
  * Created by Precastwig on 02/09/2017.
  */
-public class GameFrame extends JPanel {
+public class GameFrame extends JPanel implements ActionListener {
     private static final int DEFAULT_PADDING    = 10;
     private static final int DEFAULT_BORDER_WIDTH = 3;
     private static final int MINIMUM_CELL_LENGTH = 60;
@@ -131,13 +131,13 @@ public class GameFrame extends JPanel {
                     verticalCells * (borderWidth + cellLength) + borderWidth);
         }
 
-
+        //Paint the highlited cell colour, first check its within the borders
         if (highlightCellX >= 0
                 && highlightCellX < horizontalCells
                 && highlightCellY >= 0
                 && highlightCellY < verticalCells) {
-            boolean cellOccupied = currentGrid.getCell(highlightCellX,
-                    highlightCellY) != 0;
+            //Choose the border colour baed on what's in that cell
+            boolean cellOccupied = currentGrid.getCell(highlightCellX, highlightCellY) != 0;
             Point p = currentGrid.getLastplayed();
             if (cellOccupied) {
                 g.setColor(this.highlightOccupiedBorderColor);
@@ -156,6 +156,7 @@ public class GameFrame extends JPanel {
                     skipY + highlightCellY * (borderWidth + cellLength),
                     2 * borderWidth + cellLength,
                     2 * borderWidth + cellLength);
+            //Choose the background cell colour based on whats in the cell
             if (cellOccupied) {
                 g.setColor(this.highlightOccupiedCellColor);
             } else {
@@ -175,28 +176,46 @@ public class GameFrame extends JPanel {
                     cellLength);
         }
 
+        //Setup some colours and fonts
         g.setColor(foregroundColor);
         g.setFont(getFont());
-
+        //Double check we've got a game
         if (currentGrid == null) {
             return;
         }
+        //Change the label based on current board state
+        int winner = currentGrid.checkVictory();
+        if (winner != 0) {
+            if (winner == 1) {
+                end = true;
+                listener.changelabel("X Wins!");
+            }
 
+            if (winner == 2) {
+                end = true;
+                listener.changelabel("O Wins!");
+            }
+        } else {
+            if (currentplayer == 2) {
+                listener.changelabel("O to play");
+            } else {
+                listener.changelabel("X to play");
+            }
+        }
+        //Set a const (should be at top?)
         int verticalSkip = 16;
-
+        //Alter the font with our const
         Font font = prepareFont(cellLength, verticalSkip, g);
-
         g.setFont(font);
-
+        //More font alteration, setting AA
         Graphics2D g2 = (Graphics2D) g;
-
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
                 RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-
         FontMetrics fm = g.getFontMetrics(font);
 
         int textHeight = fm.getAscent();
         int textWidth = fm.stringWidth("X");
+
 
         int dx = (cellLength - textWidth)  / 2;
         int dy = (cellLength - textHeight) / 2;
@@ -219,13 +238,14 @@ public class GameFrame extends JPanel {
 
         int widthofsubgame = (borderWidth * 3) + (cellLength * 3);
         g2.setStroke(new BasicStroke(borderWidth * 3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL));
-        //Draw winner x's
+        //Draw winner x's and O's
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
                 if (currentGrid.checkWinners(x,y) != 0) {
                     int tlx = skipX + ( widthofsubgame * x );
                     int tly = skipY + ( widthofsubgame * y );
-                    //System.out.println("Putting square at " + tlx + "," + tly + "," + widthofsubgame + "px");
+                    // System.out.println("Hmmmmmm");
+                    // currentGrid.printwinners();
                     if (currentGrid.checkWinners(x, y) == 1) {
                         //Drawing an X
                         g2.setColor(playerOneColor);
@@ -270,7 +290,7 @@ public class GameFrame extends JPanel {
                       }
                   }
               }
-            }
+          }
         }
     }
 
@@ -294,6 +314,17 @@ public class GameFrame extends JPanel {
     @Override
     public void paint(Graphics g) {
         update(g);
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        currentGrid.resetGrid();
+        currentplayer = 1;
+        // System.out.println("before:");
+        // currentGrid.printwinners();
+        currentGrid.updateWinners();
+        // System.out.println("after:");
+        // currentGrid.printwinners();
+        repaint();
     }
 
     private Point toCellCoordinates(int x, int y) {
@@ -340,23 +371,12 @@ public class GameFrame extends JPanel {
                       (prev.x == -1 && prev.y == -1) ) {
                   if (currentGrid.setCell(p.x, p.y, currentplayer) == true) {
                       if (currentplayer == 1) {
-                          listener.changelabel("O to play");
                           currentplayer = 2;
                       } else {
-                          listener.changelabel("X to play");
                           currentplayer = 1;
                       }
                   }
               }
-              int winner = currentGrid.checkVictory();
-              if (winner == 1) {
-                end = true;
-                listener.changelabel("X Wins!");
-                // currentGrid.printwinners();
-            } else if (winner == 2) {
-                end = true;
-                listener.changelabel("O Wins!");
-            }
               //System.out.println(currentGrid.getCell(p.x,p.y));
               repaint();
           }

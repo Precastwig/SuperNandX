@@ -29,10 +29,15 @@ public class GameGrid {
                 grid[i][j].reset();
             }
         }
+        winners.reset();
+        // printwinners();
+        lastplayed = new Point(-1,-1);
     }
 
-    private void updateWinners() {
-        //System.out.println("Updating winners");
+    public void updateWinners() {
+        // System.out.println("Updating winners");
+        // printwinners();
+        // printgrid();
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 if (winners.getCell(i,j) == 0) { //Makes sure the first winner of a square is the winner
@@ -43,6 +48,7 @@ public class GameGrid {
                 }
             }
         }
+        // printwinners();
     }
 
     public int checkWinners(int x, int y) {
@@ -101,6 +107,16 @@ public class GameGrid {
                     System.out.println();
                 }
             }
+        }
+    }
+
+    public void printgrid() {
+        for (int x = 0; x < 9; x++) {
+            for (int y = 0; y < 9; y++) {
+                int[] r = translateCoords(x,y);
+                System.out.print(" " + grid[r[0]][r[1]].getCell(r[2],r[3]) + " ");
+            }
+            System.out.println("");
         }
     }
 

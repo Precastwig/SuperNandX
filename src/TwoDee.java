@@ -52,6 +52,7 @@ public class TwoDee {
                 array[i][j] = 0;
             }
         }
+        winner = 0;
     }
 
     public void printGame() {
