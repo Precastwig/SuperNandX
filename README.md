@@ -13,6 +13,7 @@ To do (in order of doing):
 - Main menu
 - Online connectivity
 - Chess clock
+
 Things i will probably never get around to but sound like good ideas:
 - Animations
 - Options (colour, size)
