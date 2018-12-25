@@ -41,10 +41,12 @@ public class GameFrame extends JPanel implements ActionListener {
     private boolean end = false;
     private int currentplayer = 1;
     private JLabel bottomlabel;
+    private JFrame mainframe;
     private static int OPACITY = 100;
     private static int HIGHLIGHTOPACITY = 170;
+    connectDialog connectmenu;
 
-    public GameFrame(labelListener label) {
+    public GameFrame(JFrame frame, labelListener label) {
         this.padding = DEFAULT_PADDING;
         this.borderWidth = DEFAULT_BORDER_WIDTH;
         this.backgroundColor = Color.WHITE;
@@ -63,6 +65,9 @@ public class GameFrame extends JPanel implements ActionListener {
         bottomlabel = new JLabel("");
         currentGrid = new GameGrid();
         listener = label;
+        mainframe = frame;
+        connectmenu = new connectDialog(mainframe, this);
+        connectmenu.pack();
         this.setMinimumSize(new Dimension(500,500));
         CanvasMouseListener mouselisten = new CanvasMouseListener();
         this.addMouseListener(mouselisten);
@@ -317,14 +322,19 @@ public class GameFrame extends JPanel implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent e) {
-        currentGrid.resetGrid();
-        currentplayer = 1;
-        // System.out.println("before:");
-        // currentGrid.printwinners();
-        currentGrid.updateWinners();
-        // System.out.println("after:");
-        // currentGrid.printwinners();
-        repaint();
+        JMenuItem source = (JMenuItem)(e.getSource());
+        switch(source.getText()) {
+            case "New game":
+                currentGrid.resetGrid();
+                currentplayer = 1;
+                currentGrid.updateWinners();
+                repaint();
+            break;
+            case "Connect":
+                connectmenu.setLocationRelativeTo(mainframe);
+                connectmenu.setVisible(true);
+            break;
+        }
     }
 
     private Point toCellCoordinates(int x, int y) {

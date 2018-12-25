@@ -23,7 +23,7 @@ public class main {
         turnlabel.setBackground(Color.WHITE);
 
         //Create the game frame and link to the turn label by passing into constructor
-        game = new GameFrame(turnlabel);
+        game = new GameFrame(frame, turnlabel);
 
         // Create menu
         JMenuBar menu = new JMenuBar();

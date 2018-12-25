@@ -139,7 +139,7 @@ public class GameGrid {
               //Otherwise we have no choice of supersquare
               gx = lastplayed.x;
               gy = lastplayed.y;
-              System.out.println(gx + " " + gy);
+              // System.out.println(gx + " " + gy);
             }
 
             //If our choice is full for some reason (end of game) just ignore
@@ -150,7 +150,7 @@ public class GameGrid {
               do {
                 x = ThreadLocalRandom.current().nextInt(0,width);
                 y = ThreadLocalRandom.current().nextInt(0,height);
-                System.out.println(gx + " " + gy + " [" + x + " " + y + "] last played = " + lastplayed.x + " " + lastplayed.y);
+                // System.out.println(gx + " " + gy + " [" + x + " " + y + "] last played = " + lastplayed.x + " " + lastplayed.y);
               } while (grid[gx][gy].getCell(x,y) != 0);
               break;
             }
