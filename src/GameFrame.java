@@ -40,6 +40,7 @@ public class GameFrame extends JPanel implements ActionListener {
     private labelListener listener;
     private boolean end = false;
     private int currentplayer = 1;
+    private int computerplayer = 0; // yes
     private JLabel bottomlabel;
     private JFrame mainframe;
     private static int OPACITY = 100;
@@ -189,6 +190,7 @@ public class GameFrame extends JPanel implements ActionListener {
             return;
         }
         //Change the label based on current board state
+
         int winner = currentGrid.checkVictory();
         if (winner != 0) {
             if (winner == 1) {
@@ -201,10 +203,11 @@ public class GameFrame extends JPanel implements ActionListener {
                 listener.changelabel("O Wins!");
             }
         } else {
+            float score = currentGrid.evaluate(currentplayer);
             if (currentplayer == 2) {
-                listener.changelabel("O to play");
+                listener.changelabel("O to play    eval:" + score);
             } else {
-                listener.changelabel("X to play");
+                listener.changelabel("X to play    eval:" + score);
             }
         }
         //Set a const (should be at top?)
@@ -474,7 +477,7 @@ public class GameFrame extends JPanel implements ActionListener {
                     tryClick(highlightCellX,highlightCellY,false);
                     break;
                 case KeyEvent.VK_C:
-                    Point p = currentGrid.findcompspot(0);
+                    Point p = currentGrid.findcompspot(1,currentplayer);
                     tryClick(p.x,p.y,false);
                     break;
             }

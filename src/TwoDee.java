@@ -13,9 +13,32 @@ public class TwoDee {
         this.width = width;
         this.height = height;
     }
+
+    public TwoDee(TwoDee copy) {
+        width = copy.getwidth();
+        height = copy.getheight();
+        array = new int[width][height];
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                array[x][y] = copy.getCell(x,y);
+            }
+        }
+        winner = copy.getwinner();
+    }
     // 0 is an unset cell
     // 1 is X
     // 2 is O
+    public int getwidth() {
+        return width;
+    }
+
+    public int getheight() {
+        return height;
+    }
+
+    public int getwinner() {
+        return winner;
+    }
 
     public boolean setCell(int x, int y, int player) {
         //System.out.println("Setting " + x + "," + y + " to " + player);
@@ -91,6 +114,41 @@ public class TwoDee {
         } else {
             return winner;
         }
+    }
+
+    public int countalmostline(int player) {
+        int ret = 0;
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (array[x][y] == player) {
+                    int xp = x + 1;
+                    int yp = y + 1;
+                    // System.out.println(xp + " " + yp + "   : " + x + " " + y);
+                    if (xp < width)
+                        if (array[xp][y] == player)
+                            ret++;
+                    if (yp < height)
+                        if (array[x][yp] == player)
+                            ret++;
+                    if (xp < width && yp < height)
+                        if (array[xp][yp] == player)
+                            ret++;
+                }
+            }
+        }
+        return ret;
+    }
+
+    public int countplayer(int player) {
+        int ret = 0;
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (array[x][y] == player) {
+                    ret++;
+                }
+            }
+        }
+        return ret;
     }
 
     //Finds the winning path

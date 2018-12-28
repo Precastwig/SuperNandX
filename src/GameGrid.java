@@ -23,6 +23,16 @@ public class GameGrid {
         }
     }
 
+    public GameGrid(GameGrid copy) {
+        for(int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                grid[x][y] = new TwoDee(copy.getsuperCell(x,y));
+            }
+        }
+        winners = new TwoDee(copy.getWinners());
+        lastplayed = new Point(copy.getLastplayed());
+    }
+
     public void resetGrid() {
         for(int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
@@ -71,8 +81,36 @@ public class GameGrid {
     //p.y = 1,2,3: the winning line is a row starting at 1,2,3
     //p.x = 1, p.y = 1: diagonal with positive gradient
     //p.x = 1, p.y = -1: diagonal with negative gradient
+    //TODO MAKE WINNING IN LAST OF A LINE SCORE HIGHER
     public Point getLineWinner() {
         return winners.findwin();
+    }
+
+    public float evaluate(int turn) {
+        int opp = 0;
+        if (turn == 1)
+            opp = 2;
+        else
+            opp = 1;
+		float winsscore = (float)winners.countplayer(turn);
+		float losescore = (float)winners.countplayer(opp);
+
+		float linescore = winners.countalmostline(turn);
+		float loselinescore = (float)winners.countalmostline(opp);
+
+        float subgamescore = 0;
+        float losesubgame = 0;
+		for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (winners.getCell(x,y) == 0) {
+                    subgamescore += grid[x][y].countalmostline(turn) * 0.3;
+                    losesubgame += grid[x][y].countalmostline(opp) * 0.3;
+                }
+            }
+        }
+
+        return winsscore - losescore + linescore - loselinescore + subgamescore - losesubgame;
+
     }
 
     //Translates from 0-8,0-8 to 0-2,0-2,0-2,0-2
@@ -93,10 +131,10 @@ public class GameGrid {
 
     //Translates from 0-2,0-2,0-2,0-2 to 0-8,0-8
     private Point reverseTranslateCoords(int gx, int gy, int x, int y) {
-      Point ret = new Point(0,0);
-      ret.x = (gx * width) + x;
-      ret.y = (gy * height) + y;
-      return ret;
+        Point ret = new Point(0,0);
+        ret.x = (gx * width) + x;
+        ret.y = (gy * height) + y;
+        return ret;
     }
 
     public void printwinners() {
@@ -124,39 +162,69 @@ public class GameGrid {
     // NOT SURE HOW YET
     // ability 0 = random
     //         1 = basic tree search?
-    public Point findcompspot(int ability) {
+    public Point findcompspot(int ability, int player) {
         int gx=0,gy=0,x=0,y=0;
         switch (ability) {
-          case 0:
-            //Find empty totally random spot
-            if (lastplayed.x == -1 && lastplayed.y == -1) {
-              //If we have an all choice then pick a supersquare at random
-              do {
-                gx = ThreadLocalRandom.current().nextInt(0,width);
-                gy = ThreadLocalRandom.current().nextInt(0,height);
-              } while (grid[gx][gy].isfull());
-            } else {
-              //Otherwise we have no choice of supersquare
-              gx = lastplayed.x;
-              gy = lastplayed.y;
-              // System.out.println(gx + " " + gy);
-            }
+            case 0:
+                //Find empty totally random spot
+                if (lastplayed.x == -1 && lastplayed.y == -1) {
+                  //If we have an all choice then pick a supersquare at random
+                  do {
+                    gx = ThreadLocalRandom.current().nextInt(0,width);
+                    gy = ThreadLocalRandom.current().nextInt(0,height);
+                  } while (grid[gx][gy].isfull());
+                } else {
+                  //Otherwise we have no choice of supersquare
+                  gx = lastplayed.x;
+                  gy = lastplayed.y;
+                  // System.out.println(gx + " " + gy);
+                }
 
-            //If our choice is full for some reason (end of game) just ignore
-            if (grid[gx][gy].isfull()) {
+                //If our choice is full for some reason (end of game)
+                if (grid[gx][gy].isfull()) {
+                    //Ignore
+                } else {
+                  // Otherwise choose a subsquare
+                  do {
+                    x = ThreadLocalRandom.current().nextInt(0,width);
+                    y = ThreadLocalRandom.current().nextInt(0,height);
+                    // System.out.println(gx + " " + gy + " [" + x + " " + y + "] last played = " + lastplayed.x + " " + lastplayed.y);
+                  } while (grid[gx][gy].getCell(x,y) != 0);
+                  break;
+                }
+            case 1:
+                //Check with a depth of 1 the next moves value according to evaluate
+                GameGrid depthgrid = new GameGrid(this);
+                Point best = new Point(0,0);
+                float top = 0;
+                if (lastplayed.x == -1 && lastplayed.y == -1) {
+                    //Check all moves why not
+                    for (y = 0; y < height; y++) {
+                        for (x = 0; x < width; x++) {
+                            if (depthgrid.getCell(x,y) == 0) {
+                                depthgrid.setCell(x,y,player);
+                                float current = depthgrid.evaluate(player);
+                                if (current > top) {
+                                    top = current;
+                                    best.x = x;
+                                    best.y = y;
+                                }
+                            }
+                        }
+                    }
+                    return best;
+                } else {
+                    for (y = 0; y < height; y++) {
+                        for (x = 0; x < width; x++) {
+                            if (depthgrid.getCell(x,y) == 0) {
+                                
+                            }
+                        }
+                    }
+                }
 
-            } else {
-              // Otherwise choose a subsquare
-              do {
-                x = ThreadLocalRandom.current().nextInt(0,width);
-                y = ThreadLocalRandom.current().nextInt(0,height);
-                // System.out.println(gx + " " + gy + " [" + x + " " + y + "] last played = " + lastplayed.x + " " + lastplayed.y);
-              } while (grid[gx][gy].getCell(x,y) != 0);
-              break;
-            }
-          case 1:
-            //Do more advanced things
-          break;
+
+            break;
         }
 
         //Return the translated coords
@@ -188,6 +256,10 @@ public class GameGrid {
         } else {
             return false;
         }
+    }
+
+    public TwoDee getsuperCell(int x, int y) {
+        return grid[x][y];
     }
 
     public int getCell(int x, int y) {

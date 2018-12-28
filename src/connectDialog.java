@@ -1,9 +1,9 @@
-import javax.swing.JDialog;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import java.beans.*; //property change stuff
+import javax.swing.JDialog;
 
 class connectDialog extends JDialog implements ActionListener, PropertyChangeListener {
 
@@ -16,8 +16,8 @@ class connectDialog extends JDialog implements ActionListener, PropertyChangeLis
 
 		textField = new JTextField(10);
 
-        //Create an array of the text and components to be displayed.
         String msgString1 = "What was Dr. SEUSS's real last name?";
+		//Create an array of the text and components to be displayed.
         String msgString2 = "(The answer is shit)";
         Object[] array = {msgString1, msgString2, textField};
 		Object[] options = {btnString1, btnString2};
