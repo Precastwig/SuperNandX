@@ -116,26 +116,30 @@ public class TwoDee {
         }
     }
 
+    private boolean checkthree(int a, int b, int c) {
+        if ((a == b && b == 0)
+            || (a == 0 && b == c)
+            || (b == 0 && a == c)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public int countalmostline(int player) {
         int ret = 0;
         for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                if (array[x][y] == player) {
-                    int xp = x + 1;
-                    int yp = y + 1;
-                    // System.out.println(xp + " " + yp + "   : " + x + " " + y);
-                    if (xp < width)
-                        if (array[xp][y] == player)
-                            ret++;
-                    if (yp < height)
-                        if (array[x][yp] == player)
-                            ret++;
-                    if (xp < width && yp < height)
-                        if (array[xp][yp] == player)
-                            ret++;
-                }
-            }
+            if (checkthree(array[0][y],array[1][y],array[2][y]))
+                ret++;
         }
+        for (int x = 0; x < width; x++) {
+            if (checkthree(array[x][0],array[x][1],array[x][2]))
+                ret++;
+        }
+        if (checkthree(array[0][0],array[1][1],array[2][2]))
+            ret++;
+        if (checkthree(array[2][0],array[1][1],array[0][2]))
+            ret++;
         return ret;
     }
 

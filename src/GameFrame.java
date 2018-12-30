@@ -477,7 +477,8 @@ public class GameFrame extends JPanel implements ActionListener {
                     tryClick(highlightCellX,highlightCellY,false);
                     break;
                 case KeyEvent.VK_C:
-                    Point p = currentGrid.findcompspot(1,currentplayer);
+                    GameGrid depthgrid = new GameGrid(currentGrid);
+                    Point p = depthgrid.findcompspot(1,currentplayer,10);
                     tryClick(p.x,p.y,false);
                     break;
             }
