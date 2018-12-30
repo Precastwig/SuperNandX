@@ -9,15 +9,15 @@ arrow keys and wasd = move selection reticule
 
 space = choose spot
 
-c = computer move (currently just picks totally randomly from the available choices)
+c = computer move (makes choices based on an evaluation function using alpha-beta pruning)
 
 To do (in order of doing):
-- Basic AI (based on chess robits? need an evaluation method for board states) / neural nets!??!?!? @mishawagner
 - Main menu
-- Online connectivity
+- Online connectivity (Jpopup doesn't want to work)
 - Chess clock
+- Multithreaded (for AI evauluation)
 
 Things i will probably never get around to but sound like good ideas:
+- Neural network version of AI @Mishawagner
 - Animations
 - Options (colour, size)
-- Multithreaded
