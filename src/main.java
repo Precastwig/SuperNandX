@@ -37,6 +37,7 @@ public class main {
         col = new JMenu("Online");
         menu.add(col);
         item = new JMenuItem("Connect");
+        item.addActionListener(game);
         col.add(item);
         // col.addOnClickListener()
 

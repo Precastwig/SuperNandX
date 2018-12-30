@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Ellipse2D;
+import java.net.*;
+import java.io.*;
 
 /**
  * Created by Precastwig on 02/09/2017.
@@ -67,8 +69,6 @@ public class GameFrame extends JPanel implements ActionListener {
         currentGrid = new GameGrid();
         listener = label;
         mainframe = frame;
-        connectmenu = new connectDialog(mainframe, this);
-        connectmenu.pack();
         this.setMinimumSize(new Dimension(500,500));
         CanvasMouseListener mouselisten = new CanvasMouseListener();
         this.addMouseListener(mouselisten);
@@ -326,6 +326,7 @@ public class GameFrame extends JPanel implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
         JMenuItem source = (JMenuItem)(e.getSource());
+        // System.out.println("DO THINGS");
         switch(source.getText()) {
             case "New game":
                 currentGrid.resetGrid();
@@ -334,8 +335,22 @@ public class GameFrame extends JPanel implements ActionListener {
                 repaint();
             break;
             case "Connect":
-                connectmenu.setLocationRelativeTo(mainframe);
-                connectmenu.setVisible(true);
+                String ip = "error";
+                try {
+                    URL whatismyip = new URL("http://checkip.amazonaws.com");
+                    BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
+                    ip = in.readLine(); //you get the IP as a String
+                } catch (Exception a) {
+                    System.out.println("ruh roh");
+                }
+
+                // connectmenu = new connectDialog(mainframe, this);
+                // connectmenu.setSize(300, 150);
+                String connectip = JOptionPane.showInputDialog(connectmenu, "Input an IP address to connect to, your IP is " + ip);
+                
+                // connectmenu.pack();
+                // connectmenu.setLocationRelativeTo(mainframe);
+                // connectmenu.setVisible(true);
             break;
         }
     }
