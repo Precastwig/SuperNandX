@@ -4,11 +4,19 @@ import java.awt.event.*;
 import java.awt.geom.Ellipse2D;
 import java.net.*;
 import java.io.*;
+import java.util.regex.*;
+import javax.swing.event.*;
 
 /**
  * Created by Precastwig on 02/09/2017.
  */
-public class GameFrame extends JPanel implements ActionListener {
+public class GameFrame extends JPanel implements ActionListener, ChangeListener {
+
+    public enum Sources {
+    	BAR,
+    	BUTTON
+    }
+
     private static final int DEFAULT_PADDING    = 10;
     private static final int DEFAULT_BORDER_WIDTH = 3;
     private static final int MINIMUM_CELL_LENGTH = 60;
@@ -45,9 +53,11 @@ public class GameFrame extends JPanel implements ActionListener {
     private int computerplayer = 0; // yes
     private JLabel bottomlabel;
     private JFrame mainframe;
+    private int DEPTH = 5;
     private static int OPACITY = 100;
     private static int HIGHLIGHTOPACITY = 170;
-    connectDialog connectmenu;
+    private static final Pattern PATTERN = Pattern.compile(
+        "^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
 
     public GameFrame(JFrame frame, labelListener label) {
         this.padding = DEFAULT_PADDING;
@@ -324,36 +334,59 @@ public class GameFrame extends JPanel implements ActionListener {
         update(g);
     }
 
-    public void actionPerformed(ActionEvent e) {
-        JMenuItem source = (JMenuItem)(e.getSource());
-        // System.out.println("DO THINGS");
-        switch(source.getText()) {
-            case "New game":
-                currentGrid.resetGrid();
-                currentplayer = 1;
-                currentGrid.updateWinners();
-                repaint();
-            break;
-            case "Connect":
-                String ip = "error";
-                try {
-                    URL whatismyip = new URL("http://checkip.amazonaws.com");
-                    BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
-                    ip = in.readLine(); //you get the IP as a String
-                } catch (Exception a) {
-                    System.out.println("ruh roh");
-                }
+    public boolean validate(String ip) {
+        return PATTERN.matcher(ip).matches();
+    }
 
-                // connectmenu = new connectDialog(mainframe, this);
-                // connectmenu.setSize(300, 150);
-                String connectip = JOptionPane.showInputDialog(connectmenu, "Input an IP address to connect to, your IP is " + ip);
-                
-                // connectmenu.pack();
-                // connectmenu.setLocationRelativeTo(mainframe);
-                // connectmenu.setVisible(true);
-            break;
+    public void actionPerformed(ActionEvent e) {
+        if (e.getActionCommand() == Sources.BUTTON.name()) {
+            JButton source = (JButton)(e.getSource());
+            computermove(currentplayer);
+        } else {
+            JMenuItem source = (JMenuItem)(e.getSource());
+            // System.out.println("DO THINGS");
+            switch(source.getText()) {
+                case "New game":
+                    currentGrid.resetGrid();
+                    end = false;
+                    currentplayer = 1;
+                    currentGrid.updateWinners();
+                    repaint();
+                break;
+                case "Connect":
+                    String ip = "error";
+                    try {
+                        URL whatismyip = new URL("http://checkip.amazonaws.com");
+                        BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
+                        ip = in.readLine(); //you get the IP as a String
+                    } catch (Exception a) {
+                        System.out.println(a);
+                    }
+
+                    // connectmenu = new connectDialog(mainframe, this);
+                    // connectmenu.setSize(300, 150);
+                    String connectip = JOptionPane.showInputDialog(new JPanel(), "Input an IP address to connect to, your IP is " + ip);
+                    if (validate(connectip)) {
+                        //Connect to another computer
+
+                    } else {
+                        JOptionPane.showMessageDialog(new JPanel(), "Invalid IP address");
+                    }
+                    // connectmenu.pack();
+                    // connectmenu.setLocationRelativeTo(mainframe);
+                    // connectmenu.setVisible(true);
+                break;
+            }
         }
     }
+
+    public void stateChanged(ChangeEvent e) {
+    JSlider source = (JSlider)e.getSource();
+    if (!source.getValueIsAdjusting()) {
+        DEPTH = (int)source.getValue();
+    }
+
+}
 
     private Point toCellCoordinates(int x, int y) {
         Point ret = new Point();
@@ -406,9 +439,18 @@ public class GameFrame extends JPanel implements ActionListener {
                   }
               }
               //System.out.println(currentGrid.getCell(p.x,p.y));
+              if (computerplayer == currentplayer) {
+                  computermove(currentplayer);
+              }
               repaint();
           }
         }
+    }
+
+    private void computermove(int player) {
+        GameGrid depthgrid = new GameGrid(currentGrid);
+        Point p = depthgrid.findcompspot(1,player,DEPTH);
+        tryClick(p.x,p.y,false);
     }
 
     private void tryHighlight(int x, int y) {
@@ -492,9 +534,7 @@ public class GameFrame extends JPanel implements ActionListener {
                     tryClick(highlightCellX,highlightCellY,false);
                     break;
                 case KeyEvent.VK_C:
-                    GameGrid depthgrid = new GameGrid(currentGrid);
-                    Point p = depthgrid.findcompspot(1,currentplayer,10);
-                    tryClick(p.x,p.y,false);
+                    computermove(currentplayer);
                     break;
             }
         }

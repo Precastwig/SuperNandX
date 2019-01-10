@@ -270,7 +270,7 @@ public class GameGrid {
     // BEGIN FINDING BEST NEXT LOCATION
     // NOT SURE HOW YET
     // ability 0 = random
-    //         1 = basic tree search?
+    //         1 = minmax
     public Point findcompspot(int ability, int player, int depth) {
         int gx=0,gy=0,x=0,y=0;
         switch (ability) {

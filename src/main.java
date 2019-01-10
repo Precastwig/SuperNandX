@@ -25,6 +25,20 @@ public class main {
         //Create the game frame and link to the turn label by passing into constructor
         game = new GameFrame(frame, turnlabel);
 
+        // Create slider
+        JSlider depthSlider = new JSlider(JSlider.HORIZONTAL, 0, 20, 5);
+        depthSlider.addChangeListener(game);
+        depthSlider.setMajorTickSpacing(5);
+        depthSlider.setMinorTickSpacing(1);
+        depthSlider.setPaintTicks(true);
+        depthSlider.setPaintLabels(true);
+        depthSlider.setBackground(Color.WHITE);
+
+        JButton compgo = new JButton("Computer move");
+        compgo.setActionCommand(GameFrame.Sources.BUTTON.name());
+        compgo.addActionListener(game);
+
+
         // Create menu
         JMenuBar menu = new JMenuBar();
         //Columns
@@ -45,7 +59,13 @@ public class main {
         //Add objects to frame
         frame.setJMenuBar(menu);
         frame.add(game,BorderLayout.CENTER);
-        frame.add(turnlabel, BorderLayout.PAGE_END);
+        JPanel bottombit = new JPanel(new BorderLayout());
+        bottombit.setBackground(Color.WHITE);
+        bottombit.add(depthSlider, BorderLayout.PAGE_END);
+        bottombit.add(turnlabel, BorderLayout.CENTER);
+        bottombit.add(compgo, BorderLayout.LINE_END);
+        frame.add(bottombit,BorderLayout.PAGE_END);
+
         //Make see
         frame.setVisible(true);
     }
