@@ -20,7 +20,7 @@ public class AI extends NotifyingThread {
 	}
 
 	public Point getReturn() {
-		System.out.println("Thread returning " + ret.x + " " + ret.y);
+		// System.out.println("Thread returning " + ret.x + " " + ret.y);
 		return ret;
 	}
 

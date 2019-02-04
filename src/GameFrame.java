@@ -348,6 +348,7 @@ public class GameFrame extends JPanel implements ActionListener, ChangeListener,
         Point p = computer.getReturn();
         thinking = false;
         tryClick(p.x,p.y,false);
+        repaint();
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -466,7 +467,8 @@ public class GameFrame extends JPanel implements ActionListener, ChangeListener,
         computer.addListener(this);
         thinking = true;
         computer.start();
-        System.out.println("AI started at depth " + DEPTH + " as player " + player);
+        repaint();
+        // System.out.println("AI started at depth " + DEPTH + " as player " + player);
     }
 
     private void tryHighlight(int x, int y) {
