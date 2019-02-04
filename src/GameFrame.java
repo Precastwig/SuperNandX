@@ -10,7 +10,7 @@ import javax.swing.event.*;
 /**
  * Created by Precastwig on 02/09/2017.
  */
-public class GameFrame extends JPanel implements ActionListener, ChangeListener {
+public class GameFrame extends JPanel implements ActionListener, ChangeListener, ThreadCompleteListener {
 
     public enum Sources {
     	BAR,
@@ -50,10 +50,11 @@ public class GameFrame extends JPanel implements ActionListener, ChangeListener 
     private labelListener listener;
     private boolean end = false;
     private int currentplayer = 1;
-    private int computerplayer = 0; // yes
+    private int computerplayer = 2; // yes
     private JLabel bottomlabel;
     private JFrame mainframe;
     private int DEPTH = 5;
+    private AI computer;
     private static int OPACITY = 100;
     private static int HIGHLIGHTOPACITY = 170;
     private static final Pattern PATTERN = Pattern.compile(
@@ -213,7 +214,7 @@ public class GameFrame extends JPanel implements ActionListener, ChangeListener 
                 listener.changelabel("O Wins!");
             }
         } else {
-            float score = currentGrid.evaluate(currentplayer);
+            float score = AI.evaluate(currentplayer,currentGrid);
             if (currentplayer == 2) {
                 listener.changelabel("O to play    eval:" + score);
             } else {
@@ -308,8 +309,9 @@ public class GameFrame extends JPanel implements ActionListener, ChangeListener 
                       }
                   }
               }
-          }
+            }
         }
+
     }
 
     private Font prepareFont(int cellLength, int verticalSkip, Graphics g) {
@@ -336,6 +338,11 @@ public class GameFrame extends JPanel implements ActionListener, ChangeListener 
 
     public boolean validate(String ip) {
         return PATTERN.matcher(ip).matches();
+    }
+
+    public void threadComplete(final Thread thread) {
+        Point p = computer.getReturn();
+        tryClick(p.x,p.y,false);
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -449,8 +456,10 @@ public class GameFrame extends JPanel implements ActionListener, ChangeListener 
 
     private void computermove(int player) {
         GameGrid depthgrid = new GameGrid(currentGrid);
-        Point p = depthgrid.findcompspot(1,player,DEPTH);
-        tryClick(p.x,p.y,false);
+        // AI computer = new AI(DEPTH, player, depthgrid);
+        computer = new AI(DEPTH, player, depthgrid);
+        computer.addListener(this);
+        computer.start();
     }
 
     private void tryHighlight(int x, int y) {
