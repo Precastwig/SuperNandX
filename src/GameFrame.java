@@ -55,6 +55,7 @@ public class GameFrame extends JPanel implements ActionListener, ChangeListener,
     private JFrame mainframe;
     private int DEPTH = 5;
     private AI computer;
+    private boolean thinking = false;
     private static int OPACITY = 100;
     private static int HIGHLIGHTOPACITY = 170;
     private static final Pattern PATTERN = Pattern.compile(
@@ -312,6 +313,9 @@ public class GameFrame extends JPanel implements ActionListener, ChangeListener,
             }
         }
 
+        if (thinking) {
+            g.drawString("Thinking", getWidth() / 2, getHeight() / 2);
+        }
     }
 
     private Font prepareFont(int cellLength, int verticalSkip, Graphics g) {
@@ -342,6 +346,7 @@ public class GameFrame extends JPanel implements ActionListener, ChangeListener,
 
     public void threadComplete(final Thread thread) {
         Point p = computer.getReturn();
+        thinking = false;
         tryClick(p.x,p.y,false);
     }
 
@@ -424,7 +429,7 @@ public class GameFrame extends JPanel implements ActionListener, ChangeListener,
     }
 
     private void tryClick(int x, int y, boolean translatecoords) {
-        if (!end) {
+        if (!end && !thinking) {
           Point p;
           if (translatecoords == true) {
               p = toCellCoordinates(x, y);
@@ -459,7 +464,9 @@ public class GameFrame extends JPanel implements ActionListener, ChangeListener,
         // AI computer = new AI(DEPTH, player, depthgrid);
         computer = new AI(DEPTH, player, depthgrid);
         computer.addListener(this);
+        thinking = true;
         computer.start();
+        System.out.println("AI started at depth " + DEPTH + " as player " + player);
     }
 
     private void tryHighlight(int x, int y) {
